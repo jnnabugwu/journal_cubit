@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "654467094275",
+    "project_id": "four-quarters-journaling",
+    "storage_bucket": "four-quarters-journaling.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:654467094275:android:c746b9a2a4eaab35007b36",
+        "android_client_info": {
+          "package_name": "com.jmagic.journal_cubit"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIkKhwDNbLSe3CtUyJrCDlwEqTeUdHetI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
