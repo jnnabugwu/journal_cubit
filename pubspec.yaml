@@ -40,18 +40,18 @@ dependencies:
   firebase_auth: ^4.17.8
   cloud_firestore: ^4.15.8
   firebase_core: ^2.27.0
+  flutter_cache_manager: ^3.3.1
   equatable: ^2.0.5
   dartz: ^0.10.1
+  google_sign_in: ^6.1.0
+  meta: ^1.8.0
+  get_it: ^7.6.7
+
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
   flutter_lints: ^2.0.0
 
 # For information on the generic Dart part of this file, see the

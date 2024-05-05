@@ -1,10 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:equatable/equatable.dart';
 
 ///what problem am i trying to solve here
 ///what does the user model contain
 ///email, name, uid
 
-class UserModel {
+class UserModel extends Equatable {
   final String email;
   final String name;
   final String uid;
@@ -23,4 +23,16 @@ class UserModel {
       : email = json['email'] as String,
         name = json['name'] as String,
         uid = json['uid'] as String;
+
+  static const empty = UserModel(uid: '', email: '', name: '');
+
+  /// Convenience getter to determine whether the current user is empty.
+  bool get isEmpty => this == UserModel.empty;
+
+  /// Convenience getter to determine whether the current user is not empty.
+  bool get isNotEmpty => this != UserModel.empty;
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [email, uid, name];
 }

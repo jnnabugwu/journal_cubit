@@ -1,7 +1,16 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:journal_cubit/views/sign_in_page.dart';
+import 'package:journal_cubit/core/services/injection_container.dart';
+import 'package:journal_cubit/core/services/router.dart';
+import 'package:journal_cubit/firebase_options.dart';
+import 'package:journal_cubit/presentation/views/sign_in_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await init();
   runApp(const MyApp());
 }
 
@@ -32,7 +41,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const SignInPage(),
+      onGenerateRoute: generateRoute,
     );
   }
 }
