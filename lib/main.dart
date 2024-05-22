@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:journal_cubit/core/services/injection_container.dart';
 import 'package:journal_cubit/core/services/router.dart';
 import 'package:journal_cubit/firebase_options.dart';
-import 'package:journal_cubit/presentation/views/sign_in_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
