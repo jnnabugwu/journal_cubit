@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:journal_cubit/core/errors/failures.dart';
 import 'package:journal_cubit/domain/models/entry.dart';
 
 abstract class JournalRemoteDataSource {
@@ -11,7 +12,7 @@ abstract class JournalRemoteDataSource {
 
   Future<void> addJournalEntry(
       {required EntryModel entryModel, required String userId});
-  Future<List<EntryModel>> getAllJournals({required String userId});
+  Stream<QuerySnapshot<EntryModel>> getAllJournals({required String userId});
   Future<void> deleteJournalEntry({required String journalId});
 }
 
@@ -24,10 +25,16 @@ class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
 
   @override
   Future<void> addJournalEntry(
-      {required EntryModel entryModel, required String userId}) {
+      {required EntryModel entryModel, required String userId}) async {
     // TODO: implement addJournalEntry
-    // what do i need
-    throw UnimplementedError();
+    // what do i need to do 
+    // connect to the cloud doc and use user id 
+    try {
+     await _cloudStoreClient.collection('users').doc(userId).collection('journal_entries').add(entryModel.toJson());
+    } catch (e) {
+      ServerFailure(message: e.toString(), statusCode: 500);
+    }
+    //am i adding a user everytime 
   }
 
   @override
@@ -37,8 +44,15 @@ class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
   }
 
   @override
-  Future<List<EntryModel>> getAllJournals({required String userId}) {
+  Stream<QuerySnapshot<EntryModel>> getAllJournals({required String userId}) {
     // TODO: implement getAllJournals
-    throw UnimplementedError();
-  }
+    final collection = FirebaseFirestore.instance.collection('users').doc(userId).collection('journal_entries')
+    .withConverter(fromFirestore: (snapshot,_) => EntryModel.fromFirestore(snapshot,_), toFirestore: (entryModel, _) => entryModel.toFirestore());
+    try{
+      return collection.snapshots();
+    } catch (e) {
+      ServerFailure(message: e.toString(), statusCode: 500);
+    }
+    throw ServerFailure(message: 'Something went wrong in getting all the journals', statusCode: 500);
+  } 
 }
