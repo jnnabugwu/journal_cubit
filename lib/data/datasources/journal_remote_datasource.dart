@@ -12,7 +12,7 @@ abstract class JournalRemoteDataSource {
 
   Future<void> addJournalEntry(
       {required EntryModel entryModel, required String userId});
-  Stream<List<EntryModel>> getAllJournals({required String userId});
+  Stream<QuerySnapshot<EntryModel>> getAllJournals({required String userId});
   Future<void> deleteJournalEntry({required String journalId});
 }
 
@@ -44,26 +44,15 @@ class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
   }
 
   @override
- Stream<List<EntryModel>> getAllJournals({required String userId}) {
-  final collection = FirebaseFirestore.instance
-      .collection('users')
-      .doc(userId)
-      .collection('journal_entries')
-      .withConverter(
-        fromFirestore: (snapshot, _) => EntryModel.fromFirestore(snapshot, _),
-        toFirestore: (entryModel, _) => entryModel.toFirestore(),
-      );
-
-  try {
-    return collection.snapshots().map((querySnapshot) {
-      return querySnapshot.docs.map((doc) => doc.data()).toList();
-    });
-  } catch (e) {
-    // Handle the error by emitting an error event in the stream
-    return Stream.error(ServerFailure(
-      message: 'Error getting journals: ${e.toString()}',
-      statusCode: 500,
-    ));
-  }
-  }
-  }
+  Stream<QuerySnapshot<EntryModel>> getAllJournals({required String userId}) {
+    // TODO: implement getAllJournals
+    final collection = FirebaseFirestore.instance.collection('users').doc(userId).collection('journal_entries')
+    .withConverter(fromFirestore: (snapshot,_) => EntryModel.fromFirestore(snapshot,_), toFirestore: (entryModel, _) => entryModel.toFirestore());
+    try{
+      return collection.snapshots();
+    } catch (e) {
+      ServerFailure(message: e.toString(), statusCode: 500);
+    }
+    throw ServerFailure(message: 'Something went wrong in getting all the journals', statusCode: 500);
+  } 
+}

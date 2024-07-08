@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:journal_cubit/core/common/i_field.dart';
 import 'package:journal_cubit/core/utils/core_utils.dart';
-import 'package:journal_cubit/presentation/auth_bloc/auth_bloc.dart';
+import 'package:journal_cubit/presentation/bloc/auth_bloc.dart';
 import 'package:journal_cubit/presentation/views/sign_in_page.dart';
 import 'package:journal_cubit/presentation/widgets/sign_in_form.dart';
 

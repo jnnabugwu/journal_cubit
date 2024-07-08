@@ -46,10 +46,4 @@ class AuthRepoImpl implements AuthRepository {
       return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
     }
   }
-  @override
-  Future<String> getCurrentUserId()async{
-    
-    String uid = await _remoteDataSource.getCurrentUserId();
-    return uid;
-  }
 }

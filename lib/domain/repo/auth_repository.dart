@@ -14,5 +14,4 @@ abstract class AuthRepository {
   ResultFuture<void> signUp(
       {required String name, required String email, required String password});
   ResultFuture<void> forgotPassword(String email);
-  Future<String> getCurrentUserId();
 }

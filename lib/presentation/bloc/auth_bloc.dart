@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/material.dart';
 import 'package:journal_cubit/domain/models/user.dart';
 import 'package:journal_cubit/presentation/usecases/forgot_password.dart';
 import 'package:journal_cubit/presentation/usecases/sign_in.dart';
@@ -38,11 +37,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         SignInParams(email: event.email, password: event.password));
 
     result.fold((failure) => emit(AuthError(failure.errorMessage)), (user) {
-      debugPrint('logging user');
-      debugPrint(user.toString());
+      print('logging user');
+      print(user);
       emit(SignedIn(user));
     });
-    return null;
   }
 
   Future<void> _signUpHandler(

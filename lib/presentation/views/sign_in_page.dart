@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:journal_cubit/core/utils/core_utils.dart';
-import 'package:journal_cubit/presentation/views/dashboard.dart';
 import 'package:journal_cubit/presentation/views/sign_up_page.dart';
 import 'package:journal_cubit/presentation/widgets/sign_in_form.dart';
 
-import '../auth_bloc/auth_bloc.dart';
+import '../bloc/auth_bloc.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -65,24 +64,6 @@ class _SignInPageState extends State<SignInPage> {
                 onPressed: () =>
                     Navigator.pushNamed(context, SignUpScreen.routeName),
                 child: const Text('Register'))
-          ,
-            Builder(
-              builder: (context) {
-
-               if(state is SignedIn){
-                return  ElevatedButton(
-                  onPressed: () => 
-                  Navigator.pushNamed(context, DashboardPage.routeName)
-                , child: const Text('Go to dashboard page'),
-                  
-                );
-               }
-                 else{
-                  return const SizedBox(height: 0,);
-                }
-              }
-            )
-          
           ],
         );
       }),

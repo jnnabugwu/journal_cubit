@@ -33,5 +33,6 @@ class UserModel extends Equatable {
   bool get isNotEmpty => this != UserModel.empty;
 
   @override
+  // TODO: implement props
   List<Object?> get props => [email, uid, name];
 }
