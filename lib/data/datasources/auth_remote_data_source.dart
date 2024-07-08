@@ -6,6 +6,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class AuthRemoteDataSource {
   const AuthRemoteDataSource();
+
+  Future<String> getCurrentUserId();
+
   Future<void> forgotPassword(String email);
 
   /// always use the the model not the enitity
@@ -91,6 +94,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } catch (e, s) {
       debugPrintStack(stackTrace: s);
       throw ServerException(message: e.toString(), statusCode: '505');
+    }
+  }
+  @override
+  Future<String> getCurrentUserId() async {
+    try{
+      return _authClient.currentUser!.uid;
+    } catch (e){
+      throw 'No User logged in';
     }
   }
 
