@@ -8,6 +8,8 @@ abstract class AuthRemoteDataSource {
   const AuthRemoteDataSource();
   Future<void> forgotPassword(String email);
 
+  Future<String> getCurrentUserId();
+
   /// always use the the model not the enitity
   Future<UserModel> signIn({
     required String email,
@@ -107,5 +109,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
                   name: user.displayName ?? '')
               .toJson(),
         );
+  }
+  
+  @override
+  Future<String> getCurrentUserId() async {
+    try{
+      return  _authClient.currentUser!.uid;
+    }catch(e){
+      throw 'Not Logged in';
+    }
   }
 }

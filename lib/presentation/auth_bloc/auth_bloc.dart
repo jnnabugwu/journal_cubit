@@ -31,7 +31,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SignUp _signUp;
   final ForgotPassword _forgotPassword;
 
-  Future<UserModel?> _signInHandler(
+  Future<void> _signInHandler(
       SignInEvent event, Emitter<AuthState> emit) async {
     final result = await _signIn(
         SignInParams(email: event.email, password: event.password));

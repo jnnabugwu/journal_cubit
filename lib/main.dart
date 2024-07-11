@@ -1,8 +1,10 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:journal_cubit/core/services/injection_container.dart';
 import 'package:journal_cubit/core/services/router.dart';
 import 'package:journal_cubit/firebase_options.dart';
+import 'package:journal_cubit/presentation/auth_bloc/auth_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,16 +12,26 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await init();
-  runApp(const MyApp());
+  runApp(
+    BlocProvider<AuthBloc>(
+       create: (BuildContext context) => AuthBloc(signIn: 
+       sl(), signUp: sl(), forgotPassword: sl()),
+         child: MyApp(),
+         )
+    );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+   MyApp({super.key});
+
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: _navigatorKey,
       title: 'Journal App',
       theme: ThemeData(
         // This is the theme of your application.

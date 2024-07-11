@@ -26,9 +26,6 @@ class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
   @override
   Future<void> addJournalEntry(
       {required EntryModel entryModel, required String userId}) async {
-    // TODO: implement addJournalEntry
-    // what do i need to do 
-    // connect to the cloud doc and use user id 
     try {
      await _cloudStoreClient.collection('users').doc(userId).collection('journal_entries').add(entryModel.toJson());
     } catch (e) {
