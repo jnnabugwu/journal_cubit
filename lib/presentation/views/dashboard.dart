@@ -22,7 +22,7 @@ class DashboardPage extends StatelessWidget {
 
       appBar: AppBar(actions: [
         authState is SignedIn ?
-        Text('Whats on your mind, ${authState.user.name}?'):
+        Text('Whats on your mind, Hello?'):
         const Text('Not Logged in yet')
         ]),
 
@@ -49,7 +49,7 @@ class DashboardPage extends StatelessWidget {
                   lastUpdated: DateTime.now(),
                   journalId: uuid.v4()
                 )
-              , authState.user.uid));
+              , 'lkalkcasjclkasc'));
             }
            , child: const Text('Enter whats on your mind'))
           ]

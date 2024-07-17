@@ -1,38 +1,40 @@
 part of 'auth_bloc.dart';
 
-abstract class AuthState extends Equatable {
-  const AuthState();
+enum AuthenticationStatus { unknown, authenticated, unauthenticated }
+class AuthState extends Equatable {
+  final AuthenticationStatus status;
+  final UserModel? user;
+
+
+  const AuthState({required this.status, this.user});
   @override
   List<Object> get props => [];
 }
 
 class AuthInitial extends AuthState {
-  const AuthInitial();
+  const AuthInitial({required super.status});
 }
 
 class AuthLoading extends AuthState {
-  const AuthLoading();
+  const AuthLoading({required super.status});
 }
 
 class SignedIn extends AuthState {
-  const SignedIn(this.user);
+  const SignedIn({required super.status, super.user});
 
-  final UserModel user;
 
-  @override
-  List<Object> get props => [user];
 }
 
 class ForgotPasswordSent extends AuthState {
-  const ForgotPasswordSent();
+  const ForgotPasswordSent({required super.status});
 }
 
 class SignedUp extends AuthState {
-  const SignedUp();
+  const SignedUp({required super.status, super.user});
 }
 
 class AuthError extends AuthState {
-  const AuthError(this.message);
+  const AuthError({required super.status, required this.message});
 
   final String message;
 

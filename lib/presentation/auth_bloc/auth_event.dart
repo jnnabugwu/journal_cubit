@@ -5,6 +5,7 @@ abstract class AuthEvent extends Equatable {
 }
 
 class SignInEvent extends AuthEvent {
+  //does signing in give me a token 
   const SignInEvent({
     required this.email,
     required this.password,
@@ -36,4 +37,25 @@ class SignUpEvent extends AuthEvent {
 
   @override
   List<String> get props => [email, password, name];
+}
+
+class LoggedIn extends AuthEvent{
+final String token;
+
+const LoggedIn({required this.token});
+
+  @override
+  List<Object> get props => [token];
+}
+
+class LoggedOut extends AuthEvent{
+  @override
+  List<Object> get props => [];
+  
+}
+
+class AppStarted extends AuthEvent{
+  @override
+  List<Object> get props => [];
+
 }

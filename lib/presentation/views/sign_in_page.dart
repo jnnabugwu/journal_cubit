@@ -45,7 +45,7 @@ class _SignInPageState extends State<SignInPage> {
               height: MediaQuery.of(context).size.height * .20,
             ),
             state is SignedIn
-                ? Text(state.user.name)
+                ? Text(state.user!.name)
                 : const Text('Not logged in yet'),
             SignInForm(
               emailController: emailController,
