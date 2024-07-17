@@ -4,6 +4,8 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_secure_storage/test/test_flutter_secure_storage_platform.dart';
+import 'package:journal_cubit/core/services/user_cache.dart';
 import 'package:journal_cubit/domain/models/user.dart';
 import 'package:journal_cubit/presentation/usecases/forgot_password.dart';
 import 'package:journal_cubit/presentation/usecases/sign_in.dart';
@@ -14,13 +16,17 @@ part 'auth_state.dart';
 
 const storage = FlutterSecureStorage();
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
+  final UserCache _userCache;
+
   AuthBloc({
     required SignIn signIn,
     required SignUp signUp,
     required ForgotPassword forgotPassword,
+    required FlutterSecureStorage storage,
   })  : _signIn = signIn,
         _signUp = signUp,
         _forgotPassword = forgotPassword,
+        _userCache = UserCache(storage),
         super(const AuthInitial(status: AuthenticationStatus.unauthenticated)) {
     on<AuthEvent>((event, emit) {
       emit( const AuthLoading(status: AuthenticationStatus.unknown));
@@ -28,6 +34,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SignInEvent>(_signInHandler);
     on<SignUpEvent>(_signUpHandler);
     on<ForgotPasswordEvent>(_forgotPasswordHandler);
+    on<AppStarted>(_onAppStarted);
+    on<LoggedIn>(_onLoggedIn);
+    on<LoggedOut>(_onLoggedOut);
   }
 
   final SignIn _signIn;
@@ -66,38 +75,54 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     status: AuthenticationStatus.unauthenticated)),
         (_) => emit(const ForgotPasswordSent(status: AuthenticationStatus.unauthenticated)));
   }
-  void onAppStarted(AppStarted event, Emitter<AuthState> emit) async {
+  void _onAppStarted(AppStarted event, Emitter<AuthState> emit) async {
     final token = await storage.read(key: 'auth_token');
     if(token != null ) {
-      final user = await _getUserFromToken(token);
+      final cachedUser = await _userCache.getUser();
+      if (cachedUser != null){
+      emit(AuthState(status: AuthenticationStatus.authenticated, user: cachedUser));
+      } else {
+        final user = await _getUserFromToken(token);
+        if(user!=null) {
+          await _userCache.saveUser(user);
+          emit(AuthState(status: AuthenticationStatus.authenticated,user: user));
+        }else{
+          emit(const AuthState(status: AuthenticationStatus.unauthenticated));
+        }
+      }
+    }
+  }
+
+  void _onLoggedIn(LoggedIn event, Emitter<AuthState> emit) async {
+    await storage.write(key: 'auth_token', value: event.token);
+    final user = await _getUserFromToken(event.token);
+    if (user != null){
+      await _userCache.saveUser(user);
       emit(AuthState(status: AuthenticationStatus.authenticated, user: user));
     }
   }
 
-  void onLoggedIn(LoggedIn event, Emitter<AuthState> emit) async {
-    await storage.write(key: 'auth_token', value: event.token);
-    final user = await _getUserFromToken(event.token);
-    emit(AuthState(status: AuthenticationStatus.authenticated, user: user));
-  }
-
-  void onLoggedOut(LoggedOut event, Emitter<AuthState> emit) async{
+  void _onLoggedOut(LoggedOut event, Emitter<AuthState> emit) async{
     await storage.delete(key: 'auth_token');
+    await _userCache.clearUser();
     emit(const AuthState(status: AuthenticationStatus.unauthenticated));
   }
 
   Future<UserModel?> _getUserFromToken(String token) async {
     try{
       final FirebaseAuth auth = FirebaseAuth.instance;
-
       UserCredential userCredential = await auth.signInWithCustomToken(token);
-      print(userCredential.user);
-      UserModel user = UserModel(email: userCredential.user!.email!, 
-      name: userCredential.user!.displayName!, uid: userCredential.user!.uid);
+      if(userCredential.user != null){
 
+      UserModel user = UserModel(email: userCredential.user!.email!, 
+      name: userCredential.user!.displayName ?? 'User', uid: userCredential.user!.uid);
+        
       return user; 
+      }
     } catch(e){
       print('Error getting user from Firebase token: $e');
       return null;
     }
+    return null;
   }
 }

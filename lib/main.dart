@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:journal_cubit/core/services/injection_container.dart';
 import 'package:journal_cubit/core/services/router.dart';
 import 'package:journal_cubit/firebase_options.dart';
@@ -12,10 +13,16 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await init();
+  const storage = FlutterSecureStorage();
   runApp(
     BlocProvider<AuthBloc>(
-       create: (BuildContext context) => AuthBloc(signIn: 
-       sl(), signUp: sl(), forgotPassword: sl()),
+       create: (BuildContext context) { 
+      final authBloc = AuthBloc(signIn: 
+       sl(), signUp: sl(), forgotPassword: sl(), storage: storage);
+       
+       authBloc.add(AppStarted());
+       return authBloc;
+       },
          child: MyApp(),
          )
     );
