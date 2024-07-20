@@ -27,8 +27,11 @@ class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
   Future<void> addJournalEntry(
       {required EntryModel entryModel, required String userId}) async {
     try {
+     
      await _cloudStoreClient.collection('users').doc(userId).collection('journal_entries').add(entryModel.toJson());
+
     } catch (e) {
+      print('Something went wrong: ${e.toString()}');
       ServerFailure(message: e.toString(), statusCode: 500);
     }
     //am i adding a user everytime 

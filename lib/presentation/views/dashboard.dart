@@ -63,6 +63,8 @@ class _DashboardPageState extends State<DashboardPage> {
                           ),
                           authState.user!.uid
                         ));
+                        titleController.clear();
+                        contentController.clear();
                       },
                       child: const Text('Enter what\'s on your mind')
                     )

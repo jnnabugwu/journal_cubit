@@ -11,6 +11,7 @@ class EntryListBloc extends Bloc<EntryListEvent, EntryListState> {
 
   EntryListBloc(this._dataSource) : super(EntryListInitial()) {
     on<AddEntry>((event, emit) async {
+
         try{
           await _dataSource.addJournalEntry(entryModel: event.entry, userId: event.uid);
           emit(const EntryUpdateSuccess('Added Entry'));
