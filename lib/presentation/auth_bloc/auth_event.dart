@@ -59,3 +59,8 @@ class AppStarted extends AuthEvent{
   List<Object> get props => [];
 
 }
+
+class CheckCachedUser extends AuthEvent{
+  @override
+  List<Object> get props => [];
+}

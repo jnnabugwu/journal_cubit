@@ -22,7 +22,11 @@ Route<dynamic> generateRoute(RouteSettings settings) {
 
     case DashboardPage.routeName:
       return MaterialPageRoute(builder: 
-      (_) => BlocProvider(create: (_) => sl<EntryListBloc>(),child: const DashboardPage()));
+      (_) => MultiBlocProvider(providers: [
+        BlocProvider<EntryListBloc>(create: (_) => sl<EntryListBloc>()),
+        BlocProvider<AuthBloc>(create: (_) => sl<AuthBloc>())
+      ],
+      child: const DashboardPage()));
 
     default:
       return MaterialPageRoute(

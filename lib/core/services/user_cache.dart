@@ -14,6 +14,7 @@ class UserCache {
   }
 
   Future<UserModel?> getUser() async {
+    print('getting user from cache');
     final userJson = await _storage.read(key: _userKey);
     if (userJson != null) {
       final userMap = json.decode(userJson);

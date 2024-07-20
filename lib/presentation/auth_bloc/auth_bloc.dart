@@ -4,7 +4,6 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:flutter_secure_storage/test/test_flutter_secure_storage_platform.dart';
 import 'package:journal_cubit/core/services/user_cache.dart';
 import 'package:journal_cubit/domain/models/user.dart';
 import 'package:journal_cubit/presentation/usecases/forgot_password.dart';
@@ -27,9 +26,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         _signUp = signUp,
         _forgotPassword = forgotPassword,
         _userCache = UserCache(storage),
-        super(const AuthInitial(status: AuthenticationStatus.unauthenticated)) {
+        super(const AuthInitial(status: AuthenticationStatus.unknown)) {
     on<AuthEvent>((event, emit) {
-      emit( const AuthLoading(status: AuthenticationStatus.unknown));
+      // emit(AuthState(status: AuthenticationStatus.authenticated,user: user));
     });
     on<SignInEvent>(_signInHandler);
     on<SignUpEvent>(_signUpHandler);
@@ -37,11 +36,35 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AppStarted>(_onAppStarted);
     on<LoggedIn>(_onLoggedIn);
     on<LoggedOut>(_onLoggedOut);
+    on<CheckCachedUser>(_onCheckCachedUser);
   }
 
   final SignIn _signIn;
   final SignUp _signUp;
   final ForgotPassword _forgotPassword;
+
+  Future<AuthState> _checkForCachedUsers() async {
+    try {
+      print('trying to get users from _checkForCachedUsers');
+      final user = await _userCache.getUser();
+      if (user != null) {
+        return AuthState(status: AuthenticationStatus.authenticated, user: user);
+      } else {
+       return const AuthState(status: AuthenticationStatus.unauthenticated);
+      }
+    } catch (e) {
+     return const AuthState(status: AuthenticationStatus.unauthenticated);
+    }
+  }
+
+  Future<void> _onCheckCachedUser(CheckCachedUser event, Emitter<AuthState> emit) async {
+    print('before status check');
+    if (state.status == AuthenticationStatus.unknown) {
+      print('trying to looking for users from _onCheckCachedUser');
+      final newState = await _checkForCachedUsers();
+      emit(newState);
+    }
+  }
 
   Future<void> _signInHandler(
       SignInEvent event, Emitter<AuthState> emit) async {
@@ -51,6 +74,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     result.fold((failure) => emit(AuthError(status: AuthenticationStatus.unauthenticated,message: failure.message)), (user) {
       print('logging user');
       print(user);
+      _userCache.saveUser(user);
+      print('saved user in the cache');
       emit(
         SignedIn(status: AuthenticationStatus.authenticated, user: user),
       );
@@ -102,6 +127,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
+
   void _onLoggedOut(LoggedOut event, Emitter<AuthState> emit) async{
     await storage.delete(key: 'auth_token');
     await _userCache.clearUser();
@@ -125,4 +151,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
     return null;
   }
+
+
 }

@@ -5,12 +5,23 @@ import 'package:journal_cubit/domain/models/entry.dart';
 import 'package:journal_cubit/presentation/auth_bloc/auth_bloc.dart';
 import 'package:journal_cubit/presentation/bloc/entrylist_bloc.dart';
 import 'package:uuid/uuid.dart';
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
-  
+
   static const routeName = '/dashboard';
 
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
   final Uuid uuid = const Uuid();
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<AuthBloc>().add(CheckCachedUser());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +61,7 @@ class DashboardPage extends StatelessWidget {
                             lastUpdated: DateTime.now(),
                             journalId: uuid.v4()
                           ),
-                          'lkalkcasjclkasc'
+                          authState.user!.uid
                         ));
                       },
                       child: const Text('Enter what\'s on your mind')

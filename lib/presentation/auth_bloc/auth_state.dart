@@ -12,7 +12,7 @@ class AuthState extends Equatable {
 }
 
 class AuthInitial extends AuthState {
-  const AuthInitial({required super.status});
+  const AuthInitial({required super.status,super.user});
 }
 
 class AuthLoading extends AuthState {
