@@ -7,7 +7,11 @@ sealed class EntryListEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class LoadEntries extends EntryListEvent{}
+class LoadEntries extends EntryListEvent{
+  final String uid;
+
+  const LoadEntries(this.uid);
+}
 
 class EntriesLoading extends EntryListEvent{}
 
@@ -16,4 +20,11 @@ class AddEntry extends EntryListEvent{
   final String uid;
 
   const AddEntry(this.entry,this.uid);
+}
+
+class DeleteEntry extends EntryListEvent{
+  final String uid;
+  final String journalId;
+
+  const DeleteEntry(this.uid,this.journalId);
 }

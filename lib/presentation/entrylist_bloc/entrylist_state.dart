@@ -12,7 +12,7 @@ final class EntryListInitial extends EntryListState {}
 class EntryListLoading extends EntryListState {}
 
 class EntryListLoaded extends EntryListState {
-  final List<EntryModel> entries;
+  final Stream<QuerySnapshot<EntryModel>> entries;
 
   const EntryListLoaded(this.entries);
 }

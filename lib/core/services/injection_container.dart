@@ -6,7 +6,7 @@ import 'package:journal_cubit/data/datasources/journal_remote_datasource.dart';
 import 'package:journal_cubit/data/repo/auth_repo_impl.dart';
 import 'package:journal_cubit/domain/repo/auth_repository.dart';
 import 'package:journal_cubit/presentation/auth_bloc/auth_bloc.dart';
-import 'package:journal_cubit/presentation/bloc/entrylist_bloc.dart';
+import 'package:journal_cubit/presentation/entrylist_bloc/entrylist_bloc.dart';
 import 'package:journal_cubit/presentation/usecases/forgot_password.dart';
 import 'package:journal_cubit/presentation/usecases/sign_in.dart';
 import 'package:journal_cubit/presentation/usecases/sign_up.dart';

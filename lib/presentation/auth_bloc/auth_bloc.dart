@@ -58,9 +58,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onCheckCachedUser(CheckCachedUser event, Emitter<AuthState> emit) async {
-    print('before status check');
     if (state.status == AuthenticationStatus.unknown) {
-      print('trying to looking for users from _onCheckCachedUser');
       final newState = await _checkForCachedUsers();
       emit(newState);
     }
@@ -72,10 +70,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         SignInParams(email: event.email, password: event.password));
 
     result.fold((failure) => emit(AuthError(status: AuthenticationStatus.unauthenticated,message: failure.message)), (user) {
-      print('logging user');
-      print(user);
       _userCache.saveUser(user);
-      print('saved user in the cache');
       emit(
         SignedIn(status: AuthenticationStatus.authenticated, user: user),
       );
