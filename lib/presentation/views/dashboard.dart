@@ -60,7 +60,8 @@ class _DashboardPageState extends State<DashboardPage> {
                             content: contentController.text,
                             title: titleController.text,
                             lastUpdated: DateTime.now(),
-                            journalId: uuid.v4()
+                            journalId: uuid.v4(),
+                            userId: authState.user!.uid
                           ),
                           authState.user!.uid
                         ));
