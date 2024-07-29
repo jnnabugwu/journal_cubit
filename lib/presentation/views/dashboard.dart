@@ -88,13 +88,46 @@ class _DashboardPageState extends State<DashboardPage> {
                         itemCount: snapshot.data!.docs.length,
                         itemBuilder: (context, index) {
                           var doc = snapshot.data!.docs[index];
-                          return Card(
+                          return Dismissible(
+                              key: ValueKey(doc['journalId']),
+                              background: showBackground(0),
+                              secondaryBackground: showBackground(1),
+                              onDismissed: (_) {
+                                context.read<EntryListBloc>().add(DeleteEntry(
+                                  authState.user!.uid, doc['journalId']
+                                  ));
+                              },
+                            confirmDismiss: (_) {
+                              return showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: const Text('Are you sure?'),
+                                    content: const Text('Do you really want to delete?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context, false),
+                                        child: const Text('NO'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context,true),
+                                        child: const Text('Yes'),
+                                      )
+                                    ],
+                                  );
+                                });
+                            },
+                            child:   Card(
                             child: ListTile(
                               title: Text(doc['title'] ?? ''),
                               subtitle: Text(doc['content'] ?? ''),
                               trailing: Text(doc['lastUpdated'].toDate().toString()),
                             ),
+                          ),
                           );
+                          
+                        
                         },
                       );
                     },
@@ -104,12 +137,12 @@ class _DashboardPageState extends State<DashboardPage> {
               );
             },
             listener: (BuildContext context, EntryListState state) {
-              if (state is EntryUpdateSuccess) {
-                CoreUtils.showSnackBar(context, 'Added your note');
-              }
-              if (state is EntryListError) {
-                CoreUtils.showSnackBar(context, 'Something went wrong');
-              }
+              // if (state is EntryUpdateSuccess) {
+              //   CoreUtils.showSnackBar(context, 'Added your note');
+              // }
+              // if (state is EntryListError) {
+              //   CoreUtils.showSnackBar(context, 'Something went wrong');
+              // }
             },
           ),
         );
@@ -118,6 +151,20 @@ class _DashboardPageState extends State<DashboardPage> {
     context.read<EntryListBloc>().add(LoadEntries(authState.user!.uid));
     }
     },
+    );
+  }
+
+  Widget showBackground(int direction){
+    return Container(
+      margin: const EdgeInsets.all(4.0),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      color: Colors.red,
+      alignment: direction == 0 ? Alignment.centerLeft : Alignment.centerRight,
+      child: const Icon(
+        Icons.delete,
+        size: 30,
+        color: Colors.white
+      )
     );
   }
 }

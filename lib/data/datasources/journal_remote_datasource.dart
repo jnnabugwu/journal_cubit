@@ -43,8 +43,26 @@ class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
   }
 
   @override
-  Future<void> deleteJournalEntry({required String journalId,required String uid}) {
-    throw UnimplementedError();
+  Future<void> deleteJournalEntry({required String journalId,required String uid}) async {
+    //delete from journal entries with journal id 
+    //delete from list using FieldValue operations
+   
+      try {
+        var doc = await _cloudStoreClient.collection('journal_entries').
+        where('journalId', isEqualTo: journalId).get();
+        var docId = doc.docs.first.id;
+        await _cloudStoreClient.collection('journal_entries')
+            .doc(docId).delete();
+        await
+        _cloudStoreClient.collection('users').doc(uid).update({
+          'journalEntriesIds': FieldValue.arrayRemove([journalId]),
+        });
+      }
+      catch (e) {
+        throw 'No element found';
+      }
+
+
   }
 
   @override
