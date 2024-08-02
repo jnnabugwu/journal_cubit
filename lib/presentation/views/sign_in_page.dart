@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:journal_cubit/core/utils/core_utils.dart';
+import 'package:journal_cubit/presentation/views/dashboard.dart';
 import 'package:journal_cubit/presentation/views/sign_up_page.dart';
 import 'package:journal_cubit/presentation/widgets/sign_in_form.dart';
 
-import '../bloc/auth_bloc.dart';
+import '../auth_bloc/auth_bloc.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -44,7 +45,7 @@ class _SignInPageState extends State<SignInPage> {
               height: MediaQuery.of(context).size.height * .20,
             ),
             state is SignedIn
-                ? Text(state.user.name)
+                ? Text(state.user!.name)
                 : const Text('Not logged in yet'),
             SignInForm(
               emailController: emailController,
@@ -58,12 +59,25 @@ class _SignInPageState extends State<SignInPage> {
                         email: emailController.text,
                         password: passwordController.text));
                   }
+                  passwordController.clear();
+                  emailController.clear();
                 },
                 child: const Text('Sign In')),
             ElevatedButton(
                 onPressed: () =>
                     Navigator.pushNamed(context, SignUpScreen.routeName),
-                child: const Text('Register'))
+                child: const Text('Register')),
+                state is SignedIn ?
+                ElevatedButton(onPressed: () {
+                  Navigator.pushNamed(context,
+                  DashboardPage.routeName,
+                  );
+                  passwordController.clear();
+                  emailController.clear();
+                }, child: 
+                 const Text('Dashboard page'),
+                  ) :
+                const SizedBox(),
           ],
         );
       }),

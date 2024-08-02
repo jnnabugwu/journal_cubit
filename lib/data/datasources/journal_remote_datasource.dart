@@ -13,7 +13,8 @@ abstract class JournalRemoteDataSource {
   Future<void> addJournalEntry(
       {required EntryModel entryModel, required String userId});
   Stream<QuerySnapshot<EntryModel>> getAllJournals({required String userId});
-  Future<void> deleteJournalEntry({required String journalId});
+  Future<void> deleteJournalEntry({required String journalId, required String uid});
+  Future<void> updateJournalEntry({required String journalId, required String title, required String content});
 }
 
 class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
@@ -26,27 +27,49 @@ class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
   @override
   Future<void> addJournalEntry(
       {required EntryModel entryModel, required String userId}) async {
-    // TODO: implement addJournalEntry
-    // what do i need to do 
-    // connect to the cloud doc and use user id 
     try {
-     await _cloudStoreClient.collection('users').doc(userId).collection('journal_entries').add(entryModel.toJson());
+    
+     await Future.wait([
+        _cloudStoreClient.collection('journal_entries').add(entryModel.toJson()),
+        _cloudStoreClient.collection('users').doc(userId).update({
+          'journalEntriesIds' : FieldValue.arrayUnion([entryModel.journalId])
+        })
+     ]);
+
     } catch (e) {
+      print('Something went wrong: ${e.toString()}');
       ServerFailure(message: e.toString(), statusCode: 500);
     }
     //am i adding a user everytime 
   }
 
   @override
-  Future<void> deleteJournalEntry({required String journalId}) {
-    // TODO: implement deleteJournalEntry
-    throw UnimplementedError();
+  Future<void> deleteJournalEntry({required String journalId,required String uid}) async {
+    //delete from journal entries with journal id 
+    //delete from list using FieldValue operations
+   
+      try {
+        var doc = await _cloudStoreClient.collection('journal_entries').
+        where('journalId', isEqualTo: journalId).get();
+        var docId = doc.docs.first.id;
+        await _cloudStoreClient.collection('journal_entries')
+            .doc(docId).delete();
+        await
+        _cloudStoreClient.collection('users').doc(uid).update({
+          'journalEntriesIds': FieldValue.arrayRemove([journalId]),
+        });
+      }
+      catch (e) {
+        throw 'No element found';
+      }
+
+
   }
 
   @override
   Stream<QuerySnapshot<EntryModel>> getAllJournals({required String userId}) {
     // TODO: implement getAllJournals
-    final collection = FirebaseFirestore.instance.collection('users').doc(userId).collection('journal_entries')
+    final collection = FirebaseFirestore.instance.collection('journal_entries').where('userId', isEqualTo: userId)
     .withConverter(fromFirestore: (snapshot,_) => EntryModel.fromFirestore(snapshot,_), toFirestore: (entryModel, _) => entryModel.toFirestore());
     try{
       return collection.snapshots();
@@ -55,4 +78,26 @@ class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
     }
     throw ServerFailure(message: 'Something went wrong in getting all the journals', statusCode: 500);
   } 
+  
+  @override
+  Future<void> updateJournalEntry({required String journalId, required String title,
+   required String content}) async {
+    
+    try{
+      var doc = await _cloudStoreClient.collection('journal_entries').
+        where('journalId', isEqualTo: journalId).get();
+      var docId = doc.docs.first.id;
+      await _cloudStoreClient.collection('journal_entries').doc(docId).update(
+        {
+          'title' : title,
+          'content': content,
+          'lastUpdated': DateTime.now()
+        }
+      );
+    }
+    catch (e){
+      throw ServerFailure(message: e.toString(), statusCode: 404);
+    }
+  }
 }
+ 
