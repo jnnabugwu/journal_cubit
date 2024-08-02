@@ -120,14 +120,15 @@ class _DashboardPageState extends State<DashboardPage> {
                             },
                             child:   Card(
                             child: ListTile(
+                              onTap: () {
+                                showJournal(doc['title'], doc['content'], doc['journalId']);
+                              },
                               title: Text(doc['title'] ?? ''),
                               subtitle: Text(doc['content'] ?? ''),
                               trailing: Text(doc['lastUpdated'].toDate().toString()),
                             ),
                           ),
                           );
-                          
-                        
                         },
                       );
                     },
@@ -137,12 +138,12 @@ class _DashboardPageState extends State<DashboardPage> {
               );
             },
             listener: (BuildContext context, EntryListState state) {
-              // if (state is EntryUpdateSuccess) {
-              //   CoreUtils.showSnackBar(context, 'Added your note');
-              // }
-              // if (state is EntryListError) {
-              //   CoreUtils.showSnackBar(context, 'Something went wrong');
-              // }
+              if (state is EntryUpdateSuccess) {
+                CoreUtils.showSnackBar(context, 'Added your note');
+              }
+              if (state is EntryListError) {
+                CoreUtils.showSnackBar(context, 'Something went wrong');
+              }
             },
           ),
         );
@@ -166,5 +167,70 @@ class _DashboardPageState extends State<DashboardPage> {
         color: Colors.white
       )
     );
+  }
+
+  showJournal(String title, String content, String journalId){
+    final entryListBloc = context.read<EntryListBloc>();
+    final TextEditingController contentPopupController = TextEditingController(
+          text: content
+        );
+    final TextEditingController titlePopupController = TextEditingController(
+      text: title
+    );
+    bool isNotEditting = true;
+
+
+    return showDialog(
+      context: context,
+      builder: (BuildContext context){
+        return StatefulBuilder(builder: (context,setState){
+          return SimpleDialog(
+          title: const Text('Edit'),
+          children: [
+            Column(
+              children: [
+                /// Need to show the same thing from the creation screen
+                /// two text fields 
+                /// an edit button and a save button 
+                TextField(
+                    controller: titlePopupController,
+                    style: const TextStyle(color: Colors.green, fontSize: 14),
+                    enabled: !isNotEditting,
+                  ),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: contentPopupController,
+                    style: const TextStyle(color: Colors.black),
+                    maxLines: 6,
+                    enabled: !isNotEditting,
+                  ),
+               const SizedBox(
+                    height: 30,
+                ),
+                ElevatedButton(onPressed: () {
+                  setState(() {
+                    isNotEditting = false;
+                  });
+                }, 
+                child: const Text('Edit Journal')
+                ),
+                const SizedBox(height: 20,),
+                ElevatedButton(
+                  onPressed: isNotEditting ? null : () {
+                  setState(() {
+                    entryListBloc.add(EditEntry(journalId, titlePopupController.value.text,
+                     contentPopupController.value.text));
+                    isNotEditting = true;
+                    Navigator.of(context).pop();
+                  });
+                }, 
+                child: const Text('Save Edits Journal')
+                )
+              ],
+            )
+          ],
+        );
+        });
+    });
   }
 }

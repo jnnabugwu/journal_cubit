@@ -28,3 +28,11 @@ class DeleteEntry extends EntryListEvent{
 
   const DeleteEntry(this.uid,this.journalId);
 }
+
+class EditEntry extends EntryListEvent{
+  final String journalId;
+  final String title;
+  final String content;
+
+  const EditEntry(this.journalId, this.title, this.content);
+}

@@ -14,6 +14,7 @@ abstract class JournalRemoteDataSource {
       {required EntryModel entryModel, required String userId});
   Stream<QuerySnapshot<EntryModel>> getAllJournals({required String userId});
   Future<void> deleteJournalEntry({required String journalId, required String uid});
+  Future<void> updateJournalEntry({required String journalId, required String title, required String content});
 }
 
 class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
@@ -77,5 +78,26 @@ class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
     }
     throw ServerFailure(message: 'Something went wrong in getting all the journals', statusCode: 500);
   } 
+  
+  @override
+  Future<void> updateJournalEntry({required String journalId, required String title,
+   required String content}) async {
+    
+    try{
+      var doc = await _cloudStoreClient.collection('journal_entries').
+        where('journalId', isEqualTo: journalId).get();
+      var docId = doc.docs.first.id;
+      await _cloudStoreClient.collection('journal_entries').doc(docId).update(
+        {
+          'title' : title,
+          'content': content,
+          'lastUpdated': DateTime.now()
+        }
+      );
+    }
+    catch (e){
+      throw ServerFailure(message: e.toString(), statusCode: 404);
+    }
+  }
 }
  

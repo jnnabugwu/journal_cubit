@@ -21,6 +21,7 @@ class EntryListBloc extends Bloc<EntryListEvent, EntryListState> {
     });
     on<LoadEntries>(_getEntries);
     on<DeleteEntry>(_deleteJournal);
+    on<EditEntry>(_editJournal);
   
   }
 
@@ -37,6 +38,15 @@ class EntryListBloc extends Bloc<EntryListEvent, EntryListState> {
     emit(const EntryUpdateSuccess('Journal Deleted'));
     } catch(e){
       emit(const EntryListError('Journal did not delete'));
+    }
+  }
+
+  Future<void> _editJournal(EditEntry event, Emitter<EntryListState> emit) async {
+    try{
+      _dataSource.updateJournalEntry(journalId: event.journalId, title: event.title, content: event.content);
+      emit(const EntryUpdateSuccess('Journal Edited'));
+    }catch(e){
+      emit(const EntryListError('Journal did not update'));
     }
   }
  
