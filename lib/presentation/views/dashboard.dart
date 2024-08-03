@@ -121,7 +121,8 @@ class _DashboardPageState extends State<DashboardPage> {
                             child:   Card(
                             child: ListTile(
                               onTap: () {
-                                showJournal(doc['title'], doc['content'], doc['journalId']);
+                                showJournal(doc['title'], doc['content'],
+                                 doc['journalId'], authState.user!.uid);
                               },
                               title: Text(doc['title'] ?? ''),
                               subtitle: Text(doc['content'] ?? ''),
@@ -139,10 +140,10 @@ class _DashboardPageState extends State<DashboardPage> {
             },
             listener: (BuildContext context, EntryListState state) {
               if (state is EntryUpdateSuccess) {
-                CoreUtils.showSnackBar(context, 'Added your note');
+                CoreUtils.showSnackBar(context, state.message);
               }
               if (state is EntryListError) {
-                CoreUtils.showSnackBar(context, 'Something went wrong');
+                CoreUtils.showSnackBar(context, state.message);
               }
             },
           ),
@@ -169,7 +170,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  showJournal(String title, String content, String journalId){
+  showJournal(String title, String content, String journalId, String uid){
     final entryListBloc = context.read<EntryListBloc>();
     final TextEditingController contentPopupController = TextEditingController(
           text: content
@@ -219,7 +220,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   onPressed: isNotEditting ? null : () {
                   setState(() {
                     entryListBloc.add(EditEntry(journalId, titlePopupController.value.text,
-                     contentPopupController.value.text));
+                     contentPopupController.value.text, uid));
                     isNotEditting = true;
                     Navigator.of(context).pop();
                   });

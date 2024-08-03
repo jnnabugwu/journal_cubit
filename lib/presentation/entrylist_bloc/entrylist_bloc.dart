@@ -15,6 +15,8 @@ class EntryListBloc extends Bloc<EntryListEvent, EntryListState> {
         try{
           await _dataSource.addJournalEntry(entryModel: event.entry, userId: event.uid);
           emit(const EntryUpdateSuccess('Added Entry'));
+          final updatedEntries = _dataSource.getAllJournals(userId: event.uid);
+          emit(EntryListLoaded(updatedEntries)); 
         }catch (e){
           emit(const EntryListError('didnt add entry'));
         }
@@ -35,7 +37,9 @@ class EntryListBloc extends Bloc<EntryListEvent, EntryListState> {
   Future<void> _deleteJournal(DeleteEntry event, Emitter<EntryListState> emit) async {
     try {
     _dataSource.deleteJournalEntry(journalId: event.journalId, uid: event.uid);
+    final updatedEntries = _dataSource.getAllJournals(userId: event.uid);
     emit(const EntryUpdateSuccess('Journal Deleted'));
+    emit(EntryListLoaded(updatedEntries));
     } catch(e){
       emit(const EntryListError('Journal did not delete'));
     }

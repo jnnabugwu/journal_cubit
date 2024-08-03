@@ -33,6 +33,7 @@ class EditEntry extends EntryListEvent{
   final String journalId;
   final String title;
   final String content;
+  final String uid;
 
-  const EditEntry(this.journalId, this.title, this.content);
+  const EditEntry(this.journalId, this.title, this.content, this.uid);
 }
