@@ -1,16 +1,7 @@
 # journal_cubit
 
-A new Flutter project.
+A journaling app that is being built with the Bloc state management system.
 
-## Getting Started
+This project showcases my ability to use Bloc and build Flutter projects.
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The future of the project is to come up with a name and have it so that you are prompted to journal at the end of the day after looking at your emotions throughout the day.  
