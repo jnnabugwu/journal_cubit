@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:journal_cubit/core/common/i_field.dart';
 import 'package:journal_cubit/core/utils/core_utils.dart';
 import 'package:journal_cubit/domain/models/entry.dart';
 import 'package:journal_cubit/presentation/auth_bloc/auth_bloc.dart';
@@ -33,7 +34,7 @@ class _DashboardPageState extends State<DashboardPage> {
         return Scaffold(
           appBar: AppBar(
             actions: [
-              Text(authState.user?.name ?? 'Hello not signed in')
+              Padding(padding: const EdgeInsets.only(right: 40),child: Text(authState.user?.name ?? 'Hello not signed in'))
             ]
           ),
           body: BlocConsumer<EntryListBloc, EntryListState>(
@@ -42,15 +43,36 @@ class _DashboardPageState extends State<DashboardPage> {
               return Column(
                 children: [
                   const SizedBox(height: 50),
-                  TextField(
-                    controller: titleController,
-                    style: const TextStyle(color: Colors.green, fontSize: 14),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: IField(
+                      controller: titleController,
+                    ),
                   ),
                   const SizedBox(height: 20),
-                  TextField(
-                    controller: contentController,
-                    style: const TextStyle(color: Colors.black),
-                    maxLines: 6,
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: IField(
+                      controller: contentController,
+                      textLines: 6,
+                      inputDecoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: const BorderSide(color: Colors.grey),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: BorderSide(
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                            // overwriting the default padding helps with that puffy look
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                          ),
+                    ),
                   ),
                   if (authState.status == AuthenticationStatus.authenticated)
                     ElevatedButton(
