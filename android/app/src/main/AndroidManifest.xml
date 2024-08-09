@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="journal_cubit"
-        android:name="fourquartersjournaling"
+        android:label="uche"
+        android:name="uche"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
