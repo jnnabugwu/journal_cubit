@@ -6,7 +6,6 @@ import 'package:journal_cubit/core/services/injection_container.dart';
 import 'package:journal_cubit/core/services/router.dart';
 import 'package:journal_cubit/firebase_options.dart';
 import 'package:journal_cubit/presentation/auth_bloc/auth_bloc.dart';
-import 'package:journal_cubit/theme/app_theme.dart';
 import 'package:journal_cubit/theme/material_theme.dart';
 
 void main() async {

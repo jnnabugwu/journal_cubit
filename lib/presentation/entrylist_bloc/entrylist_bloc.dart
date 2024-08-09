@@ -47,8 +47,10 @@ class EntryListBloc extends Bloc<EntryListEvent, EntryListState> {
 
   Future<void> _editJournal(EditEntry event, Emitter<EntryListState> emit) async {
     try{
-      _dataSource.updateJournalEntry(journalId: event.journalId, title: event.title, content: event.content);
+      _dataSource.updateJournalEntry(journalId: event.journalId, title: event.title, content: event.content, uid: event.uid);
       emit(const EntryUpdateSuccess('Journal Edited'));
+      final updatedEntries = _dataSource.getAllJournals(userId: event.uid);
+      emit(EntryListLoaded(updatedEntries));      
     }catch(e){
       emit(const EntryListError('Journal did not update'));
     }
