@@ -6,14 +6,21 @@ import 'package:journal_cubit/core/services/injection_container.dart';
 import 'package:journal_cubit/core/services/router.dart';
 import 'package:journal_cubit/firebase_options.dart';
 import 'package:journal_cubit/presentation/auth_bloc/auth_bloc.dart';
+import 'package:journal_cubit/theme/app_theme.dart';
+import 'package:journal_cubit/theme/material_theme.dart';
 
 void main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await init();
   const storage = FlutterSecureStorage();
+
+  // Create an instance of MaterialTheme
+  final materialTheme = const MaterialTheme(TextTheme()).light();
+
   runApp(
     BlocProvider<AuthBloc>(
        create: (BuildContext context) { 
@@ -23,13 +30,14 @@ void main() async {
        authBloc.add(AppStarted());
        return authBloc;
        },
-         child: MyApp(),
+         child: MyApp(themeData: materialTheme),
          )
     );
 }
 
 class MyApp extends StatelessWidget {
-   MyApp({super.key});
+  final ThemeData themeData;
+   MyApp({super.key, required this.themeData});
 
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
@@ -40,26 +48,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       navigatorKey: _navigatorKey,
       title: 'Journal App',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: themeData,
       onGenerateRoute: generateRoute,
     );
   }
 }
+

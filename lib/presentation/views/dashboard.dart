@@ -29,12 +29,15 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     final TextEditingController contentController = TextEditingController();
     final TextEditingController titleController = TextEditingController();
+    var size = MediaQuery.of(context).size;
+    final width = size.width;
+
     return BlocConsumer<AuthBloc, AuthState>(
       builder: (context, authState) {
         return Scaffold(
           appBar: AppBar(
             actions: [
-              Padding(padding: const EdgeInsets.only(right: 40),child: Text(authState.user?.name ?? 'Hello not signed in'))
+              Padding(padding: EdgeInsets.only(right: width * .45 ),child: Text(authState.user?.name ?? 'Hello not signed in'))
             ]
           ),
           body: BlocConsumer<EntryListBloc, EntryListState>(
@@ -215,17 +218,32 @@ class _DashboardPageState extends State<DashboardPage> {
                 /// Need to show the same thing from the creation screen
                 /// two text fields 
                 /// an edit button and a save button 
-                TextField(
+                IField(
                     controller: titlePopupController,
-                    style: const TextStyle(color: Colors.green, fontSize: 14),
                     enabled: !isNotEditting,
                   ),
                   const SizedBox(height: 20),
-                  TextField(
+                  IField(
                     controller: contentPopupController,
-                    style: const TextStyle(color: Colors.black),
-                    maxLines: 6,
+                    textLines: 6,
                     enabled: !isNotEditting,
+                    inputDecoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: const BorderSide(color: Colors.grey),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: BorderSide(
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                            // overwriting the default padding helps with that puffy look
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                          ),
                   ),
                const SizedBox(
                     height: 30,

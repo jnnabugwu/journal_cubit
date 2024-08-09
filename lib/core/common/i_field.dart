@@ -15,7 +15,8 @@ class IField extends StatelessWidget {
     this.hintStyle,
     this.overrideValidator = false,
     this.textLines,
-    this.inputDecoration
+    this.inputDecoration,
+    this.enabled
   });
 
   final String? Function(String?)? validator;
@@ -31,10 +32,12 @@ class IField extends StatelessWidget {
   final TextStyle? hintStyle;
   final int? textLines;
   final InputDecoration? inputDecoration;
+  final bool? enabled;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      enabled: enabled,
       maxLines: textLines ?? 1,
       controller: controller,
       validator: overrideValidator
