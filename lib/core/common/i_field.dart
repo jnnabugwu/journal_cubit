@@ -14,6 +14,9 @@ class IField extends StatelessWidget {
     this.keyboardType,
     this.hintStyle,
     this.overrideValidator = false,
+    this.textLines,
+    this.inputDecoration,
+    this.enabled
   });
 
   final String? Function(String?)? validator;
@@ -27,10 +30,15 @@ class IField extends StatelessWidget {
   final TextInputType? keyboardType;
   final bool overrideValidator;
   final TextStyle? hintStyle;
+  final int? textLines;
+  final InputDecoration? inputDecoration;
+  final bool? enabled;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      enabled: enabled,
+      maxLines: textLines ?? 1,
       controller: controller,
       validator: overrideValidator
           ? validator
@@ -46,7 +54,7 @@ class IField extends StatelessWidget {
       keyboardType: keyboardType,
       obscureText: obscureText,
       readOnly: readOnly,
-      decoration: InputDecoration(
+      decoration: inputDecoration ?? InputDecoration(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(90),
         ),

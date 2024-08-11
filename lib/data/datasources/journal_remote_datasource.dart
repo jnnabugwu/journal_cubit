@@ -14,7 +14,7 @@ abstract class JournalRemoteDataSource {
       {required EntryModel entryModel, required String userId});
   Stream<QuerySnapshot<EntryModel>> getAllJournals({required String userId});
   Future<void> deleteJournalEntry({required String journalId, required String uid});
-  Future<void> updateJournalEntry({required String journalId, required String title, required String content});
+  Future<void> updateJournalEntry({required String journalId, required String title, required String content, required String uid});
 }
 
 class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
@@ -35,7 +35,6 @@ class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
           'journalEntriesIds' : FieldValue.arrayUnion([entryModel.journalId])
         })
      ]);
-
     } catch (e) {
       print('Something went wrong: ${e.toString()}');
       ServerFailure(message: e.toString(), statusCode: 500);
@@ -81,7 +80,7 @@ class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
   
   @override
   Future<void> updateJournalEntry({required String journalId, required String title,
-   required String content}) async {
+   required String content, required String uid}) async {
     
     try{
       var doc = await _cloudStoreClient.collection('journal_entries').
