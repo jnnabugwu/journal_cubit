@@ -35,7 +35,6 @@ class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
           'journalEntriesIds' : FieldValue.arrayUnion([entryModel.journalId])
         })
      ]);
-
     } catch (e) {
       print('Something went wrong: ${e.toString()}');
       ServerFailure(message: e.toString(), statusCode: 500);

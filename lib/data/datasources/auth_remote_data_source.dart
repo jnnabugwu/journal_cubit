@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:journal_cubit/analytics_engine.dart';
 import 'package:journal_cubit/core/errors/exception.dart';
 import 'package:journal_cubit/domain/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -61,10 +62,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         throw const ServerException(
             message: 'Please try again later', statusCode: 'Unknown Error');
       }
-      print('getting token');
       final token = await user.getIdToken();
       storage.write(key: 'auth_token', value: token);
       var userData = await _getUserData(user.uid);
+      AnalyticsEngine.userLogsIn('email');
       return UserModel.fromJson(userData.data()!);
     } on FirebaseAuthException catch (e) {
       throw ServerException(
