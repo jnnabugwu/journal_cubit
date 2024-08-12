@@ -18,17 +18,17 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   final Uuid uuid = const Uuid();
-
+  final TextEditingController contentController = TextEditingController();
+  final TextEditingController titleController = TextEditingController();
   @override
   void initState() {
     super.initState();
     context.read<AuthBloc>().add(CheckCachedUser());
   }
 
+
   @override
   Widget build(BuildContext context) {
-    final TextEditingController contentController = TextEditingController();
-    final TextEditingController titleController = TextEditingController();
     var size = MediaQuery.of(context).size;
     final width = size.width;
 
@@ -82,8 +82,8 @@ class _DashboardPageState extends State<DashboardPage> {
                       onPressed: () {
                         context.read<EntryListBloc>().add(AddEntry(
                           EntryModel(
-                            content: contentController.text,
-                            title: titleController.text,
+                            content: contentController.value.text,
+                            title: titleController.value.text,
                             lastUpdated: DateTime.now(),
                             journalId: uuid.v4(),
                             userId: authState.user!.uid

@@ -34,15 +34,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
         backgroundColor: Colors.white,
         body: BlocConsumer<AuthBloc, AuthState>(
           listener: (_, state) {
-            if (state is AuthError) {
-              CoreUtils.showSnackBar(context, 'Theres something wrong');
+            if (state is SignedUp){
+              CoreUtils.showSnackBar(context, 'Hello'
+                  ', Navigating you to the Login page');
+              Navigator.pushNamed(context, SignInPage.routeName);
+
+            }
+            if (state is AuthError){
+              CoreUtils.showSnackBar(context, state.message);
             }
           },
           builder: (BuildContext context, AuthState state) {
             return Column(
               children: [
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * .30,
+                  height: MediaQuery.of(context).size.height * .20,
                 ),
                 IField(
                   controller: nameController,
@@ -62,6 +68,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             email: emailController.text,
                             password: passwordController.text,
                             name: nameController.text));
+                      }
+                      if(state is SignedUp) {
+                        CoreUtils.showSnackBar(context, 'Hello ${state.user!.name}'
+                            ', Navigating you to the Login page');
+                        Navigator.pushNamed(context, SignInPage.routeName);
+
                       }
                     },
                     child: const Text('Sign up')),
