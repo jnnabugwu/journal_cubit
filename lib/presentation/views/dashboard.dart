@@ -108,11 +108,20 @@ class _DashboardPageState extends State<DashboardPage> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
                       }
+
+                      final sortedDocs = snapshot.data!.docs.toList()
+                      ..sort((a,b){
+                      final aDate = a['lastUpdated'];
+                      final bDate = b['lastUpdated'];
+                      return bDate.compareTo(aDate);               
+                      }); 
+
+
                       return ListView.builder(
                         shrinkWrap: true,
-                        itemCount: snapshot.data!.docs.length,
+                        itemCount: sortedDocs.length,
                         itemBuilder: (context, index) {
-                          var doc = snapshot.data!.docs[index];
+                          var doc = sortedDocs[index];
                           return Dismissible(
                               key: ValueKey(doc['journalId']),
                               background: showBackground(0),
