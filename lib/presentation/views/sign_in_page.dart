@@ -20,6 +20,8 @@ class _SignInPageState extends State<SignInPage> {
   final passwordController = TextEditingController();
   final formKey = GlobalKey<FormState>();
 
+
+
   @override
   void dispose() {
     emailController.dispose();
@@ -34,11 +36,20 @@ class _SignInPageState extends State<SignInPage> {
       body: BlocConsumer<AuthBloc, AuthState>(listener: (_, state) {
         if (state is AuthError) {
           CoreUtils.showSnackBar(
-              context, 'Something went wrong with signing in');
+              context, state.message);
+        }
+        if (state is SignedIn){
+          CoreUtils.showSnackBar(context, 'Logged in');
+          // Future.delayed(const Duration(seconds: 1),(){
+          //   Navigator.pushNamed(context,
+          //     DashboardPage.routeName,
+          //   );
+          // });
         }
       }, builder: (BuildContext context, AuthState state) {
         ///return a column with two ifields, a sizedbox, and a button to put in sign in
         ///does ifield have validation?
+        context.read<AuthBloc>().add(AppStarted());
         return Column(
           children: [
             SizedBox(

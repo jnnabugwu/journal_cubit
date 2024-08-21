@@ -110,7 +110,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     if(token != null ) {
       final cachedUser = await _userCache.getUser();
       if (cachedUser != null){
-      emit(AuthState(status: AuthenticationStatus.authenticated, user: cachedUser));
+      emit(AuthState(status: AuthenticationStatus.authenticated, user: cachedUser)
+      );
+      emit(SignedIn(status: AuthenticationStatus.authenticated, user: cachedUser));
+
       } else {
         final user = await _getUserFromToken(token);
         if(user!=null) {
