@@ -29,58 +29,77 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: BlocConsumer<AuthBloc, AuthState>(listener: (_, state) {
-        if (state is AuthError) {
-          CoreUtils.showSnackBar(
-              context, 'Something went wrong with signing in');
-        }
-      }, builder: (BuildContext context, AuthState state) {
-        ///return a column with two ifields, a sizedbox, and a button to put in sign in
-        ///does ifield have validation?
-        return Column(
-          children: [
-            SizedBox(
-              height: MediaQuery.of(context).size.height * .20,
+    return BlocConsumer<AuthBloc, AuthState>(
+      listener: (context, state) {
+
+            if (state is AuthError) {
+              CoreUtils.showSnackBar(context, state.message);
+            }
+          
+      },
+      
+      builder: (context, state) {
+        context.read<AuthBloc>().add(AppStarted());
+        return Scaffold(
+          appBar: state is SignedIn ? AppBar(
+            automaticallyImplyLeading: false,
+            actions: [
+              IconButton(onPressed: () {}, icon: const Icon(Icons.delete))
+            ],
+          ) : null,
+          backgroundColor: Colors.white,
+          body: 
+             Column(
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * .20,
+                ),
+                state is SignedIn
+                    ? Text(state.user!.name)
+                    : const Text('Not logged in yet'),
+                SignInForm(
+                  emailController: emailController,
+                  passwordController: passwordController,
+                  formKey: formKey,
+                ),
+                ElevatedButton(
+                    onPressed: () {
+                      if (formKey.currentState!.validate()) {
+                        context.read<AuthBloc>().add(SignInEvent(
+                            email: emailController.text,
+                            password: passwordController.text));
+                      }
+                      passwordController.clear();
+                      emailController.clear();
+                    },
+                    child: const Text('Login')),
+                state is SignedIn
+                    ? ElevatedButton(
+                        onPressed: () =>
+                            context.read<AuthBloc>().add(LoggedOut()),
+                        child: const Text('Log Out'))
+                    : ElevatedButton(
+                        onPressed: () => Navigator.pushNamed(
+                            context, SignUpScreen.routeName),
+                        child: const Text('Register')),
+                state is SignedIn
+                    ? ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(
+                            context,
+                            DashboardPage.routeName,
+                          );
+                          passwordController.clear();
+                          emailController.clear();
+                        },
+                        child: const Text('Dashboard page'),
+                      )
+                    : const SizedBox(),
+              ],
             ),
-            state is SignedIn
-                ? Text(state.user!.name)
-                : const Text('Not logged in yet'),
-            SignInForm(
-              emailController: emailController,
-              passwordController: passwordController,
-              formKey: formKey,
-            ),
-            ElevatedButton(
-                onPressed: () {
-                  if (formKey.currentState!.validate()) {
-                    context.read<AuthBloc>().add(SignInEvent(
-                        email: emailController.text,
-                        password: passwordController.text));
-                  }
-                  passwordController.clear();
-                  emailController.clear();
-                },
-                child: const Text('Sign In')),
-            ElevatedButton(
-                onPressed: () =>
-                    Navigator.pushNamed(context, SignUpScreen.routeName),
-                child: const Text('Register')),
-                state is SignedIn ?
-                ElevatedButton(onPressed: () {
-                  Navigator.pushNamed(context,
-                  DashboardPage.routeName,
-                  );
-                  passwordController.clear();
-                  emailController.clear();
-                }, child: 
-                 const Text('Dashboard page'),
-                  ) :
-                const SizedBox(),
-          ],
+  
         );
-      }),
+      },
     );
   }
 }

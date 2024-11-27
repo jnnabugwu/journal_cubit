@@ -69,7 +69,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final result = await _signIn(
         SignInParams(email: event.email, password: event.password));
 
-    result.fold((failure) => emit(AuthError(status: AuthenticationStatus.unauthenticated,message: failure.message)), (user) {
+    result.fold((failure) => emit(AuthError(status:
+    AuthenticationStatus.unauthenticated,message: failure.message)),
+            (user) {
       _userCache.saveUser(user);
       emit(
         SignedIn(status: AuthenticationStatus.authenticated, user: user),
@@ -82,9 +84,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final result = await _signUp(SignUpParams(
         email: event.email, name: event.name, password: event.password));
 
-    result.fold((failure) => emit(AuthError(message: failure.errorMessage, 
-    status: AuthenticationStatus.unauthenticated)),
-        (_) => (const SignedUp(status: AuthenticationStatus.unauthenticated)));
+    result.fold((failure) {
+      emit(AuthError(message: failure.errorMessage,
+    status: AuthenticationStatus.unauthenticated));
+    },
+        (_) {
+           emit(
+               const SignedUp(status: AuthenticationStatus.unauthenticated)
+           );
+        },
+    );
+
   }
 
   Future<void> _forgotPasswordHandler(
@@ -100,7 +110,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     if(token != null ) {
       final cachedUser = await _userCache.getUser();
       if (cachedUser != null){
-      emit(AuthState(status: AuthenticationStatus.authenticated, user: cachedUser));
+      emit(AuthState(status: AuthenticationStatus.authenticated, user: cachedUser)
+      );
+      emit(SignedIn(status: AuthenticationStatus.authenticated, user: cachedUser));
+
       } else {
         final user = await _getUserFromToken(token);
         if(user!=null) {

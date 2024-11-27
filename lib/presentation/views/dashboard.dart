@@ -18,17 +18,17 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   final Uuid uuid = const Uuid();
-
+  final TextEditingController contentController = TextEditingController();
+  final TextEditingController titleController = TextEditingController();
   @override
   void initState() {
     super.initState();
     context.read<AuthBloc>().add(CheckCachedUser());
   }
 
+
   @override
   Widget build(BuildContext context) {
-    final TextEditingController contentController = TextEditingController();
-    final TextEditingController titleController = TextEditingController();
     var size = MediaQuery.of(context).size;
     final width = size.width;
 
@@ -82,8 +82,8 @@ class _DashboardPageState extends State<DashboardPage> {
                       onPressed: () {
                         context.read<EntryListBloc>().add(AddEntry(
                           EntryModel(
-                            content: contentController.text,
-                            title: titleController.text,
+                            content: contentController.value.text,
+                            title: titleController.value.text,
                             lastUpdated: DateTime.now(),
                             journalId: uuid.v4(),
                             userId: authState.user!.uid
@@ -108,11 +108,20 @@ class _DashboardPageState extends State<DashboardPage> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator();
                       }
+
+                      final sortedDocs = snapshot.data!.docs.toList()
+                      ..sort((a,b){
+                      final aDate = a['lastUpdated'];
+                      final bDate = b['lastUpdated'];
+                      return bDate.compareTo(aDate);               
+                      }); 
+
+
                       return ListView.builder(
                         shrinkWrap: true,
-                        itemCount: snapshot.data!.docs.length,
+                        itemCount: sortedDocs.length,
                         itemBuilder: (context, index) {
-                          var doc = snapshot.data!.docs[index];
+                          var doc = sortedDocs[index];
                           return Dismissible(
                               key: ValueKey(doc['journalId']),
                               background: showBackground(0),

@@ -28,12 +28,12 @@ class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
   Future<void> addJournalEntry(
       {required EntryModel entryModel, required String userId}) async {
     try {
-    
+    print(entryModel.content);
      await Future.wait([
         _cloudStoreClient.collection('journal_entries').add(entryModel.toJson()),
         _cloudStoreClient.collection('users').doc(userId).update({
           'journalEntriesIds' : FieldValue.arrayUnion([entryModel.journalId])
-        })
+        }),
      ]);
     } catch (e) {
       print('Something went wrong: ${e.toString()}');
