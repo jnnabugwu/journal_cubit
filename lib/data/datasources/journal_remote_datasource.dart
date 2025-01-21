@@ -28,7 +28,6 @@ class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
   Future<void> addJournalEntry(
       {required EntryModel entryModel, required String userId}) async {
     try {
-    print(entryModel.content);
      await Future.wait([
         _cloudStoreClient.collection('journal_entries').add(entryModel.toJson()),
         _cloudStoreClient.collection('users').doc(userId).update({
@@ -36,7 +35,6 @@ class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
         }),
      ]);
     } catch (e) {
-      print('Something went wrong: ${e.toString()}');
       ServerFailure(message: e.toString(), statusCode: 500);
     }
     //am i adding a user everytime 
@@ -67,7 +65,6 @@ class JournalRemoteDataSourceImpl implements JournalRemoteDataSource {
 
   @override
   Stream<QuerySnapshot<EntryModel>> getAllJournals({required String userId}) {
-    // TODO: implement getAllJournals
     final collection = FirebaseFirestore.instance.collection('journal_entries').where('userId', isEqualTo: userId)
     .withConverter(fromFirestore: (snapshot,_) => EntryModel.fromFirestore(snapshot,_), toFirestore: (entryModel, _) => entryModel.toFirestore());
     try{

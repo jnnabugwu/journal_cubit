@@ -7,6 +7,8 @@ sealed class EntryListEvent extends Equatable {
   List<Object> get props => [];
 }
 
+class ResetEntries extends EntryListEvent{}
+
 class LoadEntries extends EntryListEvent{
   final String uid;
 

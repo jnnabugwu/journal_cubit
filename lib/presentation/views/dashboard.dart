@@ -32,161 +32,157 @@ class _DashboardPageState extends State<DashboardPage> {
     var size = MediaQuery.of(context).size;
     final width = size.width;
 
-    return BlocConsumer<AuthBloc, AuthState>(
-      builder: (context, authState) {
-        return Scaffold(
-          appBar: AppBar(
-            actions: [
-              Padding(padding: EdgeInsets.only(right: width * .45 ),child: Text(authState.user?.name ?? 'Hello not signed in'))
-            ]
-          ),
-          body: BlocConsumer<EntryListBloc, EntryListState>(
-            builder: (context, entryListState) {
-              //
-              return Column(
-                children: [
-                  const SizedBox(height: 50),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: IField(
-                      controller: titleController,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: IField(
-                      controller: contentController,
-                      textLines: 6,
-                      inputDecoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15),
-                              borderSide: const BorderSide(color: Colors.grey),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(15),
-                              borderSide: BorderSide(
-                                color: Theme.of(context).primaryColor,
-                              ),
-                            ),
-                            // overwriting the default padding helps with that puffy look
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+    return Scaffold(
+      appBar: AppBar(
+        actions: [
+          BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, authState) {
+              return Padding(padding: EdgeInsets.only(right: width * .45 ),child: Text(authState.user?.name ?? 'Hello not signed in'));
+            },
+          )
+        ]
+      ),
+      body: BlocConsumer<EntryListBloc, EntryListState>(
+        builder: (context, entryListState) {
+          //
+          return Column(
+            children: [
+              const SizedBox(height: 50),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IField(
+                  controller: titleController,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: IField(
+                  controller: contentController,
+                  textLines: 6,
+                  inputDecoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: const BorderSide(color: Colors.grey),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide(
+                            color: Theme.of(context).primaryColor,
                           ),
-                    ),
-                  ),
-                  if (authState.status == AuthenticationStatus.authenticated)
-                    ElevatedButton(
-                      onPressed: () {
-                        context.read<EntryListBloc>().add(AddEntry(
-                          EntryModel(
-                            content: contentController.value.text,
-                            title: titleController.value.text,
-                            lastUpdated: DateTime.now(),
-                            journalId: uuid.v4(),
-                            userId: authState.user!.uid
-                          ),
-                          authState.user!.uid
-                        ));
-                        titleController.clear();
-                        contentController.clear();
-                      },
-                      child: const Text('Enter what\'s on your mind')
-                    ),
-                   const SizedBox(height: 10),
-                   ///How do i access the stream from state. 
-                   if (entryListState is EntryListLoaded)
-                Expanded(
-                  child: StreamBuilder<QuerySnapshot>(
-                    stream: entryListState.entries,
-                    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                      if (snapshot.hasError) {
-                        return const Text('Something went wrong');
-                      }
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      }
-
-                      final sortedDocs = snapshot.data!.docs.toList()
-                      ..sort((a,b){
-                      final aDate = a['lastUpdated'];
-                      final bDate = b['lastUpdated'];
-                      return bDate.compareTo(aDate);               
-                      }); 
-
-
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: sortedDocs.length,
-                        itemBuilder: (context, index) {
-                          var doc = sortedDocs[index];
-                          return Dismissible(
-                              key: ValueKey(doc['journalId']),
-                              background: showBackground(0),
-                              secondaryBackground: showBackground(1),
-                              onDismissed: (_) {
-                                context.read<EntryListBloc>().add(DeleteEntry(
-                                  authState.user!.uid, doc['journalId']
-                                  ));
-                              },
-                            confirmDismiss: (_) {
-                              return showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (context) {
-                                  return AlertDialog(
-                                    title: const Text('Are you sure?'),
-                                    content: const Text('Do you really want to delete?'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context, false),
-                                        child: const Text('NO'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context,true),
-                                        child: const Text('Yes'),
-                                      )
-                                    ],
-                                  );
-                                });
-                            },
-                            child:   Card(
-                            child: ListTile(
-                              onTap: () {
-                                showJournal(doc['title'], doc['content'],
-                                 doc['journalId'], authState.user!.uid);
-                              },
-                              title: Text(doc['title'] ?? ''),
-                              subtitle: Text(doc['content'] ?? ''),
-                              trailing: Text(doc['lastUpdated'].toDate().toString()),
-                            ),
-                          ),
-                          );
+                        ),
+                        // overwriting the default padding helps with that puffy look
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+                      ),
+                ),
+              ),
+              if (entryListState.authState.status == AuthenticationStatus.authenticated)
+                ElevatedButton(
+                  onPressed: () {
+                    context.read<EntryListBloc>().add(AddEntry(
+                      EntryModel(
+                        content: contentController.value.text,
+                        title: titleController.value.text,
+                        lastUpdated: DateTime.now(),
+                        journalId: uuid.v4(),
+                        userId: entryListState.authState.user!.uid
+                      ),
+                      entryListState.authState.user!.uid
+                    ));
+                    titleController.clear();
+                    contentController.clear();
+                  },
+                  child: const Text('Enter what\'s on your mind')
+                ),
+               const SizedBox(height: 10),
+               ///How do i access the stream from state. 
+               if (entryListState is EntryListLoaded)
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: entryListState.entries,
+                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasError) {
+                    return const Text('Something went wrong');
+                  }
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  }
+    
+                  final sortedDocs = snapshot.data!.docs.toList()
+                  ..sort((a,b){
+                  final aDate = a['lastUpdated'];
+                  final bDate = b['lastUpdated'];
+                  return bDate.compareTo(aDate);               
+                  }); 
+    
+    
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: sortedDocs.length,
+                    itemBuilder: (context, index) {
+                      var doc = sortedDocs[index];
+                      return Dismissible(
+                          key: ValueKey(doc['journalId']),
+                          background: showBackground(0),
+                          secondaryBackground: showBackground(1),
+                          onDismissed: (_) {
+                            context.read<EntryListBloc>().add(DeleteEntry(
+                              entryListState.authState.user!.uid, doc['journalId']
+                              ));
+                          },
+                        confirmDismiss: (_) {
+                          return showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text('Are you sure?'),
+                                content: const Text('Do you really want to delete?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context, false),
+                                    child: const Text('NO'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context,true),
+                                    child: const Text('Yes'),
+                                  )
+                                ],
+                              );
+                            });
                         },
+                        child:   Card(
+                        child: ListTile(
+                          onTap: () {
+                            showJournal(doc['title'], doc['content'],
+                             doc['journalId'], entryListState.authState.user!.uid);
+                          },
+                          title: Text(doc['title'] ?? ''),
+                          subtitle: Text(doc['content'] ?? ''),
+                          trailing: Text(doc['lastUpdated'].toDate().toString()),
+                        ),
+                      ),
                       );
                     },
-                  ),
-                ),
-                ]
-              );
-            },
-            listener: (BuildContext context, EntryListState state) {
-              if (state is EntryUpdateSuccess) {
-                CoreUtils.showSnackBar(context, state.message);
-              }
-              if (state is EntryListError) {
-                CoreUtils.showSnackBar(context, state.message);
-              }
-            },
-          ),
-        );
-      }, listener: (BuildContext context, AuthState authState) {
-    if (authState.status == AuthenticationStatus.authenticated && authState.user != null) {
-    context.read<EntryListBloc>().add(LoadEntries(authState.user!.uid));
-    }
-    },
+                  );
+                },
+              ),
+            ),
+            ]
+          );
+        },
+        listener: (BuildContext context, EntryListState state) {
+          if (state is EntryUpdateSuccess) {
+            CoreUtils.showSnackBar(context, state.message);
+          }
+          if (state is EntryListError) {
+            CoreUtils.showSnackBar(context, state.message);
+          }
+        },
+      ),
     );
   }
 

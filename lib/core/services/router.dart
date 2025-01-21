@@ -21,12 +21,18 @@ Route<dynamic> generateRoute(RouteSettings settings) {
               create: (_) => sl<AuthBloc>(), child: const SignUpScreen()));
 
     case DashboardPage.routeName:
-      return MaterialPageRoute(builder: 
-      (_) => MultiBlocProvider(providers: [
-        BlocProvider<EntryListBloc>(create: (_) => sl<EntryListBloc>()),
-        BlocProvider<AuthBloc>(create: (_) => sl<AuthBloc>())
-      ],
-      child: const DashboardPage()));
+      return MaterialPageRoute(
+        builder: (context) {
+          // Get the AuthBloc from the current context
+          final authBloc = BlocProvider.of<AuthBloc>(context);
+          
+          // Create EntryListBloc with the AuthBloc parameter
+          return BlocProvider(
+            create: (context) => sl.get<EntryListBloc>(param1: authBloc),
+            child: const DashboardPage(),
+          );
+        },
+      );
 
     default:
       return MaterialPageRoute(

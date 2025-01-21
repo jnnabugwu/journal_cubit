@@ -45,7 +45,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<AuthState> _checkForCachedUsers() async {
     try {
-      print('trying to get users from _checkForCachedUsers');
       final user = await _userCache.getUser();
       if (user != null) {
         return AuthState(status: AuthenticationStatus.authenticated, user: user);
