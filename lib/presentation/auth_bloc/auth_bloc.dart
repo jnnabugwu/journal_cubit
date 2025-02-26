@@ -6,9 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:journal_cubit/core/services/user_cache.dart';
 import 'package:journal_cubit/domain/models/user.dart';
-import 'package:journal_cubit/presentation/usecases/forgot_password.dart';
-import 'package:journal_cubit/presentation/usecases/sign_in.dart';
-import 'package:journal_cubit/presentation/usecases/sign_up.dart';
+
+import 'package:journal_cubit/domain/usecases/auth_usecases.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';

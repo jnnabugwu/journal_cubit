@@ -41,12 +41,6 @@ class _SignInPageState extends State<SignInPage> {
       builder: (context, state) {
         context.read<AuthBloc>().add(AppStarted());
         return Scaffold(
-          appBar: state is SignedIn ? AppBar(
-            automaticallyImplyLeading: false,
-            actions: [
-              IconButton(onPressed: () {}, icon: const Icon(Icons.delete))
-            ],
-          ) : null,
           backgroundColor: Colors.white,
           body: 
              Column(

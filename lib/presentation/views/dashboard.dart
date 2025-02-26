@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:journal_cubit/core/common/i_field.dart';
@@ -98,78 +97,9 @@ class _DashboardPageState extends State<DashboardPage> {
                   child: const Text('Enter what\'s on your mind')
                 ),
                const SizedBox(height: 10),
-               ///How do i access the stream from state. 
                if (entryListState is EntryListLoaded)
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: entryListState.entries,
-                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.hasError) {
-                    return const Text('Something went wrong');
-                  }
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  }
-    
-                  final sortedDocs = snapshot.data!.docs.toList()
-                  ..sort((a,b){
-                  final aDate = a['lastUpdated'];
-                  final bDate = b['lastUpdated'];
-                  return bDate.compareTo(aDate);               
-                  }); 
-    
-    
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: sortedDocs.length,
-                    itemBuilder: (context, index) {
-                      var doc = sortedDocs[index];
-                      return Dismissible(
-                          key: ValueKey(doc['journalId']),
-                          background: showBackground(0),
-                          secondaryBackground: showBackground(1),
-                          onDismissed: (_) {
-                            context.read<EntryListBloc>().add(DeleteEntry(
-                              entryListState.authState.user!.uid, doc['journalId']
-                              ));
-                          },
-                        confirmDismiss: (_) {
-                          return showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: const Text('Are you sure?'),
-                                content: const Text('Do you really want to delete?'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context, false),
-                                    child: const Text('NO'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context,true),
-                                    child: const Text('Yes'),
-                                  )
-                                ],
-                              );
-                            });
-                        },
-                        child:   Card(
-                        child: ListTile(
-                          onTap: () {
-                            showJournal(doc['title'], doc['content'],
-                             doc['journalId'], entryListState.authState.user!.uid);
-                          },
-                          title: Text(doc['title'] ?? ''),
-                          subtitle: Text(doc['content'] ?? ''),
-                          trailing: Text(doc['lastUpdated'].toDate().toString()),
-                        ),
-                      ),
-                      );
-                    },
-                  );
-                },
-              ),
+            Expanded( 
+                  child:journalCardBuilder(entryListState.entries, entryListState)
             ),
             ]
           );
@@ -184,6 +114,66 @@ class _DashboardPageState extends State<DashboardPage> {
         },
       ),
     );
+  }
+
+  ListView journalCardBuilder(List<EntryModel> entries, EntryListLoaded entryListState) {
+
+    final sortedEntries = entries
+                  ..sort((a,b){
+                  final aDate = a.lastUpdated;
+                  final bDate = b.lastUpdated;
+                  return bDate.compareTo(aDate);               
+                  }); 
+
+    return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: entries.length,
+                  itemBuilder: (context, index) {
+                    var entry = sortedEntries[index];
+                    return Dismissible(
+                        key: ValueKey(entry.journalId),
+                        background: showBackground(0),
+                        secondaryBackground: showBackground(1),
+                        onDismissed: (_) {
+                          context.read<EntryListBloc>().add(DeleteEntry(
+                            entryListState.authState.user!.uid, entry.journalId
+                            ));
+                        },
+                      confirmDismiss: (_) {
+                        return showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text('Are you sure?'),
+                              content: const Text('Do you really want to delete?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, false),
+                                  child: const Text('NO'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context,true),
+                                  child: const Text('Yes'),
+                                )
+                              ],
+                            );
+                          });
+                      },
+                      child:   Card(
+                      child: ListTile(
+                        onTap: () {
+                          showJournal(entry.title, entry.content,
+                           entry.journalId, entryListState.authState.user!.uid);
+                        },
+                        title: Text(entry.title),
+                        subtitle: Text(entry.content),
+                        trailing: Text(entry.lastUpdated.toLocal().toIso8601String()),
+                      ),
+                    ),
+                    );
+                  },
+                );
   }
 
   Widget showBackground(int direction){
